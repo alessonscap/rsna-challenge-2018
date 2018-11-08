@@ -10,15 +10,22 @@ Below you have all the information that you need to install and reproduce the re
 
 Installation
 ===================================================
+We provided two methods to build and run this project: One by using virtualenv, and another one by using docker.
 
- **1.** Firstly clone projects:
+Using virtualenv
+----------------
+
+ **1.** Firstly clone the projects:
 
 ```
 git clone https://github.com/alessonscap/keras-retinanet.git
 git clone https://github.com/alessonscap/rsna-challenge-2018.git
+
+export RSNA_PROJECT_PATH=$PWD/rsna-challenge-2018
+export RETINANET_PROJECT_PATH=$PWD/keras-retinanet
 ```
 
- **2.** Install system-wide requirements to create environment, we recommend use virtualenvwrapper. Installation guide can be found [here](https://virtualenvwrapper.readthedocs.io/en/latest/install.html).
+ **2.** Install system-wide requirements to create the environment, we recommend use virtualenvwrapper. Installation guide can be found [here](https://virtualenvwrapper.readthedocs.io/en/latest/install.html).
 
 
  **3.** Create an environment to install project dependences (make sure that you are using python3, if your `PYTHONPATH` is /usr/bin/python3) by running:
@@ -30,21 +37,48 @@ mkvirtualenv dfi-pneumonia-detection -p /usr/bin/python3
  **4.** Activate your environment and install the required pip packages:
 
 ```
+cd $RSNA_PROJECT_PATH
 workon dfi-pneumonia-detection
 pip install -r requirements.txt
 ```
 
  **5.** Create a symbolic link in your `rsna-challenge-2018/retinanet` directory pointing to the `keras-retinanet` directory:
 ```
-cd rsna-challenge-2018/retinanet/
-ln -s ../../keras-retinanet ./keras_retinanet
+cd retinanet/
+ln -s $RETINANET_PROJECT_PATH ./keras_retinanet
 ```
 
  **6.** Compile Cython code provided by the [keras-retinanet project](https://github.com/fizyr/keras-retinanet):
 ```
 cd keras_retinanet
 python setup.py build_ext --inplace
-cd ..
+```
+
+Using docker
+----------------
+**1.** Firstly clone the projects:
+```
+git clone https://github.com/alessonscap/keras-retinanet.git
+git clone https://github.com/alessonscap/rsna-challenge-2018.git
+
+export RSNA_PROJECT_PATH=$PWD/rsna-challenge-2018
+export RETINANET_PROJECT_PATH=$PWD/keras-retinanet
+```
+
+**2.** Install docker-CE. If you are using Ubuntu, you may follow [these instructions](https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-docker-ce).
+
+**3.** Install the nvidia docker runtime following [these instructions](https://github.com/NVIDIA/nvidia-docker).
+
+**4.** Build our keras-retinanet image by running: 
+```
+cd $RETINANET_PROJECT_PATH
+docker build -t dfi/keras-retinanet . 
+```
+
+**5.** Build our rsna-challenge-2018 image by running: 
+```
+cd $RSNA_PROJECT_PATH
+docker build -t dfi/rsna-challenge-2018 . 
 ```
 
 Project Overview
@@ -95,12 +129,12 @@ Here we describe the general usage of the DFI Pneumonia Detection project.
 Data Setup
 ----------------
 
-Firstly, you must download data from the RSNA Pneumonia Detection Challenge [[1]](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). Assuming that [Kaggle API](https://github.com/Kaggle/kaggle-api) is installed, the dataset can be downloaded using the commands below:  
+Firstly, you must download data from the RSNA Pneumonia Detection Challenge [[1]](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). Assuming that [Kaggle API](https://github.com/Kaggle/kaggle-api) is installed, the dataset can be downloaded using the commands below at the desired path:  
 
 ```
-cd rsna-challenge-2018/
-mkdir -p data/
-cd data/
+export RSNA_DATA_PATH=<desired-path-to-keep-data>
+mkdir -p $RSNA_DATA_PATH/
+cd $RSNA_DATA_PATH/
 kaggle competitions download -c rsna-pneumonia-detection-challenge
 ```
 
@@ -117,11 +151,19 @@ This information is given in *.csv* files. However, to easily make multiple test
 * **output_test_json_name:** Name to json with test dataset.
 * **split:** (Optional)Values to split dataset into train, val and test. (Default [70 20 10]).
 
-The json files used in stage 1 and 2 can be found at `rsna-challenge-2018/process_dataset/datasets`. If you wish to recreate the json file used in stage 2, you can use the commands below: 
+The json files used in stage 1 and 2 can be found at `rsna-challenge-2018/process_dataset/datasets`. 
 
+If you wish to recreate the json file used in stage 2, you can use the commands below: 
+
+Using virtualenv 
 ```
-cd process_dataset
-python process_data.py ../data/stage_2_train_labels.csv ../data/stage_2_detailed_class_info.csv ../data/stage_2_train_images train.json val.json test.json --split 80 20 0
+cd $RSNA_PROJECT_PATH/process_dataset
+python process_data.py $RSNA_DATA_PATH/stage_2_train_labels.csv $RSNA_DATA_PATH/stage_2_detailed_class_info.csv $RSNA_DATA_PATH/stage_2_train_images train.json val.json test.json --split 80 20 0
+```
+
+Using docker
+```
+docker run --runtime=nvidia -it --rm -v $RSNA_DATA_PATH:/data dfi/rsna-challenge-2018 python /rsna-challenge-2018/process_dataset/process_data.py /data/stage_2_train_labels.csv /data/stage_2_detailed_class_info.csv /data/stage_2_train_images /rsna-challenge-2018/process_dataset/train.json /rsna-challenge-2018/process_dataset/val.json /rsna-challenge-2018/process_dataset/test.json --split 80 20 0
 ```
 
 Model setup
@@ -130,9 +172,9 @@ Model setup
 The models used in the RSNA challenge can be downloaded by running: 
 
 ```
-cd rsna-challenge-2018/
-mkdir -p models/
-cd models/
+export RSNA_MODELS_PATH=<desired-path-to-keep-models>
+mkdir -p $RSNA_MODELS_PATH/
+cd $RSNA_MODELS_PATH/
 wget https://iarahealth.com/rsna/stage_1.h5
 wget https://iarahealth.com/rsna/stage_2.h5
 
@@ -165,16 +207,28 @@ Also, you must pass the required arguments.
 
 To reproduce our stage 1 training process, you should use the commands below: 
 
+Virtualenv
 ```
-cd rsna-challenge-2018/retinanet/
-python rsna_train.py --epochs 40 --backbone resnet101 --batch-size 14 --steps 1250 --data-aug --noise_aug_std 0.05 --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 --dropout_rate 0.1 --snapshot-path snapshots/ --tensorboard_dir logs/ rsna ../data/stage_2_train_images ../process_dataset/datasets/stage_1_train.json ../process_dataset/datasets/stage_1_val.json
+cd $RSNA_PROJECT_PATH/retinanet/
+python rsna_train.py --epochs 40 --backbone resnet101 --batch-size 14 --steps 1250 --data-aug --noise_aug_std 0.05 --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 --dropout_rate 0.1 --snapshot-path snapshots/ --tensorboard_dir logs/ rsna $RSNA_DATA_PATH/stage_2_train_images ../process_dataset/datasets/stage_1_train.json ../process_dataset/datasets/stage_1_val.json
+```
+
+Docker
+```
+docker run --runtime=nvidia -it --rm -v $RSNA_DATA_PATH:/data dfi/rsna-challenge-2018 python /rsna-challenge-2018/retinanet/rsna_train.py --epochs 40 --backbone resnet101 --batch-size 14 --steps 1250 --data-aug --noise_aug_std 0.05 --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 --dropout_rate 0.1 --snapshot-path snapshots/ --tensorboard_dir logs/ rsna /data/stage_2_train_images /rsna-challenge-2018/process_dataset/datasets/stage_1_train.json /rsna-challenge-2018/process_dataset/datasets/stage_1_val.json
 ```
 
 To reproduce our stage 2 training process, you should use the commands below:
 
+Virtualenv
 ```
-cd retinanet
-python rsna_train.py --epochs 40 --backbone resnet101 --batch-size 14 --steps 1250 --data-aug --noise_aug_std 0.05 --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 --dropout_rate 0.1 --snapshot-path snapshots/ --tensorboard_dir logs/ rsna ../data/stage_2_train_images ../process_dataset/datasets/stage_2_train.json ../process_dataset/datasets/stage_2_val.json
+cd $RSNA_PROJECT_PATH/retinanet/
+python rsna_train.py --epochs 40 --backbone resnet101 --batch-size 14 --steps 1250 --data-aug --noise_aug_std 0.05 --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 --dropout_rate 0.1 --snapshot-path snapshots/ --tensorboard_dir logs/ rsna $RSNA_DATA_PATH/stage_2_train_images ../process_dataset/datasets/stage_2_train.json ../process_dataset/datasets/stage_2_val.json
+```
+
+Docker
+```
+docker run --runtime=nvidia -it --rm -v $RSNA_DATA_PATH:/data dfi/rsna-challenge-2018 python /rsna-challenge-2018/retinanet/rsna_train.py --epochs 40 --backbone resnet101 --batch-size 14 --steps 1250 --data-aug --noise_aug_std 0.05 --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 --dropout_rate 0.1 --snapshot-path snapshots/ --tensorboard_dir logs/ rsna /data/stage_2_train_images /rsna-challenge-2018/process_dataset/datasets/stage_2_train.json /rsna-challenge-2018/process_dataset/datasets/stage_2_val.json
 ```
 
 If you want to quickly benchmark a model, you can change the steps and epochs parameters to: `--steps 10` and `--epochs 4`. 
@@ -201,14 +255,26 @@ Also, you must pass these required arguments:
 
 To reproduce our stage 1 evaluation process, you should use the commands below: 
 
+Virtualenv
 ```
-cd retinanet
-python rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path out/stage_1 --kaggle_output_file stage_1.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 ../data/stage_2_train_images ../process_dataset/datasets/rsna_test_stage_1.json ../models/stage_1.h5 
+cd $RSNA_PROJECT_PATH/retinanet/
+python rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path out/stage_1 --kaggle_output_file stage_1.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 ../data/stage_2_train_images ../process_dataset/datasets/rsna_test_stage_1.json ../models/stage_1.h5
+```
+
+Docker
+```
+docker run --runtime=nvidia -it --rm -v $RSNA_DATA_PATH:/data -v $RSNA_MODELS_PATH:/models dfi/rsna-challenge-2018 python /rsna-challenge-2018/retinanet/rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path /data/out/stage_1 --kaggle_output_file /data/stage_1.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 /data/stage_2_train_images /rsna-challenge-2018/process_dataset/datasets/rsna_test_stage_1.json /models/stage_1.h5
 ```
 
 To reproduce our stage 2 evaluation process, you should use the commands below:
 
+Virtualenv
 ```
-cd retinanet
-python rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path out/stage_1 --kaggle_output_file stage_1.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 ../data/stage_2_test_images ../process_dataset/datasets/rsna_test_stage_2.json ../models/stage_2.h5
+cd $RSNA_PROJECT_PATH/retinanet/
+python rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path out/stage_2 --kaggle_output_file stage_2.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 ../data/stage_2_test_images ../process_dataset/datasets/rsna_test_stage_2.json ../models/stage_2.h5
+```
+
+Docker
+```
+docker run --runtime=nvidia -it --rm -v $RSNA_DATA_PATH:/data -v $RSNA_MODELS_PATH:/models dfi/rsna-challenge-2018 python /rsna-challenge-2018/retinanet/rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path /data/out/stage_2 --kaggle_output_file /data/stage_2.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 /data/stage_2_test_images /rsna-challenge-2018/process_dataset/datasets/rsna_test_stage_2.json /models/stage_2.h5
 ```
