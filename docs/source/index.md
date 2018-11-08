@@ -1,12 +1,12 @@
 Introduction
 ===================================================
 
-This project contains our 10th place solution in the [RSNA Pneumonia Detection Challenge](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). The team named DASA-FIDI-IARA is composed by: MSc. Alesson Scapinello, MSc Bernardo Henz, MSc Daniel Souza, MD MSc Felipe Kitamura, MD Igor Santos and MSc José Venson.
+This project contains our 10th place solution of the [RSNA Pneumonia Detection Challenge](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). The team named DASA-FIDI-IARA is composed by: MSc. Alesson Scapinello, MSc Bernardo Henz, MSc Daniel Souza, MD MSc Felipe Kitamura, MD Igor Santos and MSc José Venson.
 
-Briefly, our solution is based on an keras implementation of [retinanet](https://github.com/fizyr/keras-retinanet) with resnet101 as backbone.
-We made some improvements to the original code, such as adding anchor ratios that best fit our training dataset, different data augmentation and hyperparameters.
+Briefly, our solution is based on an Keras implementation of [RetinaNet](https://github.com/fizyr/keras-retinanet) with resnet101 as backbone.
+We made some improvements to the original code, such as adding anchor ratios that better fit our training dataset, different data augmentation and hyperparameters.
 
-Below you have all the information that you need to install and reproduce the results.
+Below, you have all the information that you need to install and reproduce the results.
 
 Installation
 ===================================================
@@ -25,10 +25,10 @@ export RSNA_PROJECT_PATH=$PWD/rsna-challenge-2018
 export RETINANET_PROJECT_PATH=$PWD/keras-retinanet
 ```
 
- **2.** Install system-wide requirements to create the environment, we recommend use virtualenvwrapper. Installation guide can be found [here](https://virtualenvwrapper.readthedocs.io/en/latest/install.html).
+ **2.** Install system-wide requirements to create the environment, we recommend using virtualenvwrapper. Installation guide can be found [here](https://virtualenvwrapper.readthedocs.io/en/latest/install.html).
 
 
- **3.** Create an environment to install project dependences (make sure that you are using python3, if your `PYTHONPATH` is /usr/bin/python3) by running:
+ **3.** Create an environment to install project dependencies (make sure that you are using python3, if your `PYTHONPATH` is /usr/bin/python3) by running:
 
 ```
 mkvirtualenv dfi-pneumonia-detection -p /usr/bin/python3
@@ -119,7 +119,7 @@ The software used for training consists of, mainly:
 * CUDA 9.0.176
 * cuddn 7.1.4
 
-The remaining python requirements are described in `requirements.txt`.
+The remaining Python requirements are described in `requirements.txt`.
 
 Usage
 ===================================================
@@ -129,7 +129,7 @@ Here we describe the general usage of the DFI Pneumonia Detection project.
 Data Setup
 ----------------
 
-Firstly, you must download data from the RSNA Pneumonia Detection Challenge [[1]](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). Assuming that [Kaggle API](https://github.com/Kaggle/kaggle-api) is installed, the dataset can be downloaded using the commands below at the desired path:  
+Initially, you must download data from the RSNA Pneumonia Detection Challenge [[1]](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). Assuming that [Kaggle API](https://github.com/Kaggle/kaggle-api) is installed, the dataset can be downloaded using the commands below at the desired path:  
 
 ```
 export RSNA_DATA_PATH=<desired-path-to-keep-data>
@@ -186,7 +186,7 @@ Training Process
 Once you finished all installation steps and data setup, you can train your first model. To do this, you need to run `rsna_train.py` passing some arguments, such as:
 
 * **epochs:** Number of epochs to train.
-* **backbone:** Backbone model used by retinanet.
+* **backbone:** Backbone model used by RetinaNet.
 * **batch-size:** Size of the batches.
 * **steps:** Number of steps per epoch.
 * **data-aug:** Enables data augmentation.
@@ -200,7 +200,7 @@ Once you finished all installation steps and data setup, you can train your firs
 
 Also, you must pass the required arguments. 
 
-* **rsna:** Argument to define that rsna dataset is used during training.
+* **rsna:** Argument to define that RSNA dataset is used during training.
 * **rsna_path:** Path to train dataset directory.
 * **rsna_train_json:** Path to training json.
 * **rsna_val_json:** Path to validation json.
@@ -239,7 +239,7 @@ Evaluation Process
 Once you already have a trained model, you can evaluate and calculate the mAP score. To do this, you need to run `rsna_evaluate.py` passing some arguments, such as:
 
 
-* **backbone:** Backbone model used by retinanet.
+* **backbone:** Backbone model used by RetinaNet.
 * **convert-model:** Convert the model to an inference model.
 * **anchor_boxes:** Same list of anchor boxes used during training.
 * **score-threshold:** Threshold on score to filter detections with.
