@@ -1,9 +1,9 @@
 Introduction
 ===================================================
 
-This project contains our 10th place solution in the [RSNA Pneumonia Detection Challenge](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). The team named DASA-FIDI-IARA is composed by: MSc. Alesson Scapinello, MSc Bernardo Henz, MSc Daniel Souza, MD MSc Felipe Kitamura, MD Igor Santos and MSc José Venson.
+This project contains our 10th place solution in the [RSNA Pneumonia Detection Challenge](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). The team named DASA-FIDI-IARA is composed by: Alesson Scapinello, MSc, Bernardo Henz, MSc, Daniel Souza, MSc, Felipe Kitamura, MD, MSc, Igor Santos, MD and José Venson, MSc.
 
-Briefly, our solution is based on an keras implementation of [retinanet](https://github.com/fizyr/keras-retinanet) with resnet101 as backbone.
+Briefly, our solution is based on a keras implementation of [retinanet](https://github.com/fizyr/keras-retinanet) with resnet101 as backbone.
 We made some improvements to the original code, such as adding anchor ratios that best fit our training dataset, different data augmentation and hyperparameters.
 
 Below you have all the information that you need to install and reproduce the results.
@@ -11,7 +11,7 @@ Below you have all the information that you need to install and reproduce the re
 Installation
 ===================================================
 
- **1.** Firstly clone projects:
+ **1.** First, clone projects:
 
 ```
 git clone https://github.com/alessonscap/keras-retinanet.git
@@ -21,7 +21,7 @@ git clone https://github.com/alessonscap/rsna-challenge-2018.git
  **2.** Install system-wide requirements to create environment, we recommend use virtualenvwrapper. Installation guide can be found [here](https://virtualenvwrapper.readthedocs.io/en/latest/install.html).
 
 
- **3.** Create an environment to install project dependences (make sure that you are using python3, if your `PYTHONPATH` is /usr/bin/python3) by running:
+ **3.** Create an environment to install project dependencies (make sure that you are using python3, if your `PYTHONPATH` is /usr/bin/python3) by running:
 
 ```
 mkvirtualenv dfi-pneumonia-detection -p /usr/bin/python3
@@ -95,7 +95,7 @@ Here we describe the general usage of the DFI Pneumonia Detection project.
 Data Setup
 ----------------
 
-Firstly, you must download data from the RSNA Pneumonia Detection Challenge [[1]](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). Assuming that [Kaggle API](https://github.com/Kaggle/kaggle-api) is installed, the dataset can be downloaded using the commands below:  
+First, you must download data from the RSNA Pneumonia Detection Challenge [[1]](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). Assuming that [Kaggle API](https://github.com/Kaggle/kaggle-api) is installed, the dataset can be downloaded using the commands below:  
 
 ```
 cd rsna-challenge-2018/
