@@ -1,7 +1,7 @@
 Introduction
 ===================================================
 
-This project contains our 10th place solution for the [RSNA Pneumonia Detection Challenge](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). The team named DASA-FIDI-IARA is composed by: MSc. Alesson Scapinello, MSc Bernardo Henz, MSc Daniel Souza, MD MSc Felipe Kitamura, MD Igor Santos and MSc José Venson.
+This project contains our 10th place solution for the [RSNA Pneumonia Detection Challenge](https://www.kaggle.com/c/rsna-pneumonia-detection-challenge). The team named DASA-FIDI-IARA is composed by: Alesson Scapinello MSc., Bernardo Henz MSc., Daniel Souza MSc, Felipe Kitamura MD MSc, Igor Santos MD and José Venson MSc.
 
 Briefly, our solution is based on an Keras implementation of [RetinaNet](https://github.com/fizyr/keras-retinanet) with resnet101 as backbone.
 We made some improvements to the original code, such as adding anchor ratios that better fit our training dataset, different data augmentation and hyperparameters.
