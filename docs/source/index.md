@@ -25,30 +25,35 @@ export RSNA_PROJECT_PATH=$PWD/rsna-challenge-2018
 export RETINANET_PROJECT_PATH=$PWD/keras-retinanet
 ```
 
- **2.** Install system-wide requirements to create the environment, we recommend using virtualenvwrapper. Installation guide can be found [here](https://virtualenvwrapper.readthedocs.io/en/latest/install.html).
+ **2.** Install system-wide requirements to create the environment, we recommend using virtualenvwrapper. Installation guide can be found [here](https://virtualenvwrapper.readthedocs.io/en/latest/install.html). 
 
+  **3.** Install other system-wide requirements by running:
+```
+sudo apt-get install python3-tk
+```
 
- **3.** Create an environment to install project dependencies (make sure that you are using python3, if your `PYTHONPATH` is /usr/bin/python3) by running:
+ **4.** Create an environment to install project dependencies (make sure that you are using python3, if your `PYTHONPATH` is /usr/bin/python3) by running:
 
 ```
 mkvirtualenv dfi-pneumonia-detection -p /usr/bin/python3
 ```
 
- **4.** Activate your environment and install the required pip packages:
+ **5.** Activate your environment and install the required pip packages:
 
 ```
 cd $RSNA_PROJECT_PATH
 workon dfi-pneumonia-detection
+pip install cython numpy # avoids dependecy issues
 pip install -r requirements.txt
 ```
 
- **5.** Create a symbolic link in your `rsna-challenge-2018/retinanet` directory pointing to the `keras-retinanet` directory:
+ **6.** Create a symbolic link in your `rsna-challenge-2018/retinanet` directory pointing to the `keras-retinanet` directory:
 ```
-cd retinanet/
+cd $RSNA_PROJECT_PATH/retinanet/
 ln -s $RETINANET_PROJECT_PATH ./keras_retinanet
 ```
 
- **6.** Compile Cython code provided by the [keras-retinanet project](https://github.com/fizyr/keras-retinanet):
+ **7.** Compile Cython code provided by the [keras-retinanet project](https://github.com/fizyr/keras-retinanet):
 ```
 cd keras_retinanet
 python setup.py build_ext --inplace
@@ -136,6 +141,10 @@ export RSNA_DATA_PATH=<desired-path-to-keep-data>
 mkdir -p $RSNA_DATA_PATH/
 cd $RSNA_DATA_PATH/
 kaggle competitions download -c rsna-pneumonia-detection-challenge
+unzip "*.csv.zip"
+unzip -d stage_2_test_images stage_2_test_images.zip
+unzip -d stage_2_train_images stage_2_train_images.zip
+sudo chmod 777 -R . # Allows us to read the csv files
 ```
 
 The RSNA pneumonia detection challenge provided the training data as a set of patientIds, classes indicating pneumonia or non-pneumonia and bounding boxes for the positive cases. 
@@ -177,7 +186,6 @@ mkdir -p $RSNA_MODELS_PATH/
 cd $RSNA_MODELS_PATH/
 wget https://iarahealth.com/rsna/stage_1.h5
 wget https://iarahealth.com/rsna/stage_2.h5
-
 ```
 
 Training Process
@@ -258,7 +266,7 @@ To reproduce our stage 1 evaluation process, you should use the commands below:
 Virtualenv
 ```
 cd $RSNA_PROJECT_PATH/retinanet/
-python rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path out/stage_1 --kaggle_output_file stage_1.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 ../data/stage_2_train_images ../process_dataset/datasets/rsna_test_stage_1.json ../models/stage_1.h5
+python rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path out/stage_1 --kaggle_output_file stage_1.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 $RSNA_DATA_PATH/stage_2_train_images ../process_dataset/datasets/rsna_test_stage_1.json $RSNA_MODELS_PATH/stage_1.h5
 ```
 
 Docker
@@ -271,7 +279,7 @@ To reproduce our stage 2 evaluation process, you should use the commands below:
 Virtualenv
 ```
 cd $RSNA_PROJECT_PATH/retinanet/
-python rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path out/stage_2 --kaggle_output_file stage_2.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 ../data/stage_2_test_images ../process_dataset/datasets/rsna_test_stage_2.json ../models/stage_2.h5
+python rsna_evaluate.py --backbone resnet101 --convert-model --score-threshold 0.2 --nms_threshold 0.1 --save-path out/stage_2 --kaggle_output_file stage_2.csv --anchor_boxes 0.25,0.33,0.5,0.75,1,1.33,2,3,4 $RSNA_DATA_PATH/stage_2_test_images ../process_dataset/datasets/rsna_test_stage_2.json $RSNA_MODELS_PATH/stage_2.h5
 ```
 
 Docker

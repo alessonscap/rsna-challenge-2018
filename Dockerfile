@@ -7,7 +7,7 @@
 FROM dasa-fidi-iara/keras-retinanet
 
 # We need git to download some pip packages
-RUN apt-get update && apt-get install -y git libsm6
+RUN apt-get update && apt-get install -y git libsm6 python3-tk
 
 # Upgrade pip
 RUN pip install --upgrade pip

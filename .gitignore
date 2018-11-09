@@ -1,3 +1,6 @@
 retinanet/keras_retinanet
 data/
 models/
+docs/build
+**/__pycache__
+retinanet/out
