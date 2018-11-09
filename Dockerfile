@@ -4,7 +4,7 @@
 #############################
 # General setup
 #############################
-FROM dasa-fidi-iara/keras-retinanet
+FROM dfi/keras-retinanet
 
 # We need git to download some pip packages
 RUN apt-get update && apt-get install -y git libsm6 python3-tk
